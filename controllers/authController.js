@@ -9,7 +9,7 @@ const register = async (req, res) => {
     return res.status(400).json({ erreur: 'Champs obligatoires manquants' });
   }
 
-  const rolesAutorises = ['conducteur', 'gestionnaire'];
+  const rolesAutorises = ['conducteur', 'gestionnaire', 'gilet_jaune', 'autorite'];
   const roleChoisi = rolesAutorises.includes(role) ? role : 'conducteur';
 
   try {

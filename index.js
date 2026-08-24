@@ -7,7 +7,10 @@ const cors = require('cors');
 const app = express();
 
 // 3. Middlewares globaux — AVANT les routes
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 // 4. Routes — APRÈS les middlewares globaux
@@ -20,6 +23,7 @@ app.use('/auth', authRoutes);
 app.use('/parkings', parkingsRoutes);
 app.use('/reservations', reservationsRoutes);
 app.use('/vehicules', vehiculesRoutes);
+app.use('/notifications', require('./routes/notifications'));
 
 // 5. Route de test — après tout le reste
 app.get('/', (req, res) => {
@@ -30,4 +34,14 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Serveur ParkLink démarré sur le port ${PORT}`);
+});
+
+const cron = require('node-cron');
+const cloturerReservationsExpirees = require('./jobs/cloturerReservations');
+
+// Vérifie toutes les 2 minutes les réservations expirées
+
+cron.schedule('*/1 * * * *', () => {
+  console.log('[CRON] Vérification des réservations expirées...');
+  cloturerReservationsExpirees();
 });
